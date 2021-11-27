@@ -10,11 +10,11 @@ void handle_request(coap_resource_t* resource, coap_session_t* session, const co
 
 	ec = coap_get_data(request, &len, (const uint8_t**) &data);
 	if (ec != 1) {
-    	coap_pdu_set_code(response, COAP_RESPONSE_CODE_NOT_ACCEPTABLE);
+		coap_pdu_set_code(response, COAP_RESPONSE_CODE_NOT_ACCEPTABLE);
 		return;
 	}
 	if (len <= 0) {
-    	coap_pdu_set_code(response, COAP_RESPONSE_CODE_NOT_ACCEPTABLE);
+		coap_pdu_set_code(response, COAP_RESPONSE_CODE_NOT_ACCEPTABLE);
 		return;
 	}
 

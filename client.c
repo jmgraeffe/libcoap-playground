@@ -33,59 +33,59 @@ int main(int argc, char const *argv[]) {
 	if (ec < 0) {
 		printf("Could not resolve remote address!\n");
 
-  		rc = 1;
-  		goto cleanup;
+		rc = 1;
+		goto cleanup;
 	}
 
 	context = coap_new_context(NULL);
 	if (!context) {
 		printf("Could not create CoAP context!\n");
 
-  		rc = 1;
-  		goto cleanup;
+		rc = 1;
+		goto cleanup;
 	}
 
 	coap_register_response_handler(context, handle_response);
 
-  	session = coap_new_client_session(context, NULL, &address, COAP_PROTO_UDP);
-  	if (!session) {
-  		printf("Could not create CoAP session!\n");
+	session = coap_new_client_session(context, NULL, &address, COAP_PROTO_UDP);
+	if (!session) {
+		printf("Could not create CoAP session!\n");
 
-  		rc = 1;
-  		goto cleanup;
-  	}
+		rc = 1;
+		goto cleanup;
+	}
 
-  	coap_session_set_app_data(session, &ack_received);
+	coap_session_set_app_data(session, &ack_received);
 
-  	for (int i = 0; i < 10; ++i) {
+	for (int i = 0; i < 10; ++i) {
 		pdu = coap_pdu_init(COAP_MESSAGE_CON, COAP_REQUEST_CODE_PUT, coap_new_message_id(session), coap_session_max_pdu_size(session));
-	  	if (!pdu) {
-	  		printf("Could not create CoAP PDU!\n");
+		if (!pdu) {
+			printf("Could not create CoAP PDU!\n");
 
-	  		rc = 1;
-	  		goto cleanup;
-	  	}
+			rc = 1;
+			goto cleanup;
+		}
 
-	  	// dummy data
-	  	uint8_t data[16];
-	  	const size_t len = sizeof(data) / sizeof(data[0]);
+		// dummy data
+		uint8_t data[4096];
+		const size_t len = sizeof(data) / sizeof(data[0]);
 		memset(data, i, len);
-	  	
-	  	//ec = coap_add_data(pdu, len, data);
-	  	ec = coap_add_data(pdu, len, data);
-	  	if (!ec) {
-	  		printf("Could not add data to CoAP PDU!\n");
+		
+		//ec = coap_add_data(pdu, len, data);
+		ec = coap_add_data_large_request(session, pdu, len, data, NULL, NULL);
+		if (!ec) {
+			printf("Could not add data to CoAP PDU!\n");
 
-	  		rc = 1;
-	  		goto cleanup;
-	  	}
+			rc = 1;
+			goto cleanup;
+		}
 
-	  	ack_received = 0;
-	  	coap_send(session, pdu);
-	  	while (!ack_received) coap_io_process(context, COAP_IO_WAIT);
-  	}
+		ack_received = 0;
+		coap_send(session, pdu);
+		while (!ack_received) coap_io_process(context, COAP_IO_WAIT);
+	}
 
-cleanup:
+	cleanup:
 	if (session != NULL) coap_session_release(session);
 	if (context != NULL) coap_free_context(context);
 	coap_cleanup();
