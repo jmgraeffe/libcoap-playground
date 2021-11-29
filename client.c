@@ -67,13 +67,18 @@ int main(int argc, char const *argv[]) {
 			goto cleanup;
 		}
 
+		uint8_t token[8];
+		size_t token_len;
+		coap_session_new_token(session, &token_len, token);
+		coap_add_token(pdu, token_len, token);
+
 		// dummy data
 		uint8_t data[4096];
-		const size_t len = sizeof(data) / sizeof(data[0]);
-		memset(data, i, len);
+		const size_t data_len = sizeof(data) / sizeof(data[0]);
+		memset(data, i, data_len);
 		
 		//ec = coap_add_data(pdu, len, data);
-		ec = coap_add_data_large_request(session, pdu, len, data, NULL, NULL);
+		ec = coap_add_data_large_request(session, pdu, data_len, data, NULL, NULL);
 		if (!ec) {
 			printf("Could not add data to CoAP PDU!\n");
 
