@@ -3,6 +3,8 @@
 
 #include "common.h"
 
+static uint8_t i = 0;
+
 void handle_request(coap_resource_t* resource, coap_session_t* session, const coap_pdu_t* request, const coap_string_t* token, coap_pdu_t* response) {
 	int ec;
 	size_t len;
@@ -13,14 +15,19 @@ void handle_request(coap_resource_t* resource, coap_session_t* session, const co
 		coap_pdu_set_code(response, COAP_RESPONSE_CODE_NOT_ACCEPTABLE);
 		return;
 	}
-	if (len <= 0) {
-		coap_pdu_set_code(response, COAP_RESPONSE_CODE_NOT_ACCEPTABLE);
-		return;
-	}
 
 	coap_show_pdu(LOG_INFO, request);
 
+	ec = coap_add_data(response, sizeof(uint8_t), &i);
+	if (!ec) {
+		printf("Could not add data to CoAP PDU!\n");
+		coap_pdu_set_code(response, COAP_RESPONSE_CODE_INTERNAL_ERROR);
+		return;
+	}
+
 	coap_pdu_set_code(response, COAP_RESPONSE_CODE_CHANGED);
+
+	++i;
 }
 
 int main(int argc, char const *argv[]) {
