@@ -67,12 +67,11 @@ int main(int argc, char const *argv[]) {
 		}
 
 		// dummy data
-		uint8_t data[4096];
+		uint8_t data[16];
 		const size_t len = sizeof(data) / sizeof(data[0]);
 		memset(data, i, len);
 		
-		//ec = coap_add_data(pdu, len, data);
-		ec = coap_add_data_large_request(session, pdu, len, data, NULL, NULL);
+		ec = coap_add_data(pdu, len, data);
 		if (!ec) {
 			printf("Could not add data to CoAP PDU!\n");
 
