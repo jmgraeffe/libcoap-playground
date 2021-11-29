@@ -45,6 +45,7 @@ int main(int argc, char const *argv[]) {
 		goto cleanup;
 	}
 
+	coap_context_set_block_mode(context, COAP_BLOCK_USE_LIBCOAP | COAP_BLOCK_SINGLE_BODY);
 	coap_register_response_handler(context, handle_response);
 
 	session = coap_new_client_session(context, NULL, &address, COAP_PROTO_UDP);
@@ -67,11 +68,12 @@ int main(int argc, char const *argv[]) {
 		}
 
 		// dummy data
-		uint8_t data[16];
+		uint8_t data[4096];
 		const size_t len = sizeof(data) / sizeof(data[0]);
 		memset(data, i, len);
 		
-		ec = coap_add_data(pdu, len, data);
+		//ec = coap_add_data(pdu, len, data);
+		ec = coap_add_data_large_request(session, pdu, len, data, NULL, NULL);
 		if (!ec) {
 			printf("Could not add data to CoAP PDU!\n");
 
