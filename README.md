@@ -1,5 +1,10 @@
 # libcoap playground
 
+Place to play around with libcoap for me, but it's a pretty solid minimal example
+for libcoap too I guess.
+
+See branches for different variants.
+
 ## Setup
 ```
 sudo apt install build-essential cmake
